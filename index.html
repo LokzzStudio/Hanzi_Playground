@@ -4,314 +4,44 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hanzi Playground</title>
-<meta name="description" content="The eight Hanzi Heroes at play: an animated SVG playground with swings, a seesaw, a slide and games of chase.">
+<meta name="description" content="The eight Hanzi Heroes at play in a playground. Watch in 2D or in 3D.">
 <meta property="og:title" content="Hanzi Playground">
-<meta property="og:description" content="The eight Hanzi Heroes at play: an animated SVG playground with swings, a seesaw, a slide and games of chase.">
-<meta property="og:image" content="https://lokzzstudio.github.io/Hanzi_Playground/assets/preview.png">
+<meta property="og:description" content="The eight Hanzi Heroes at play in a playground. Watch in 2D or in 3D.">
+<meta property="og:image" content="https://lokzzstudio.github.io/Hanzi_Playground/assets/preview-3d.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='55' r='42' fill='%23bf97e0'/%3E%3Ccircle cx='50' cy='48' r='20' fill='%233a3562'/%3E%3Ccircle cx='50' cy='48' r='14' fill='%23f4cfb2'/%3E%3Ccircle cx='50' cy='48' r='8' fill='%23111'/%3E%3C/svg%3E">
 <style>
-  html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(#7cc8ff 50%,#62b545 50%)}
-  svg{display:block;width:100vw;height:100vh}
-  .hero{cursor:pointer}
-  .eyes{transform-box:fill-box;transform-origin:center;animation:blink 4.6s infinite}
-  @keyframes blink{0%,95%,100%{transform:scaleY(1)}97.5%{transform:scaleY(.12)}}
-  .cloud{animation:drift linear infinite}
-  @keyframes drift{from{transform:translateX(-340px)}to{transform:translateX(1940px)}}
+  :root{--bg:#f6f1e7;--ink:#22201c;--muted:#6b665c;--card:#fff;--line:#e3dccd;--lift:#0002}
+  @media (prefers-color-scheme:dark){:root{--bg:#1b1a17;--ink:#f2eee6;--muted:#a9a394;--card:#262420;--line:#3a372f;--lift:#0008}}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:32px 16px;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{width:min(980px,100%)}
+  h1{margin:0 0 6px;font-size:clamp(28px,5vw,44px);letter-spacing:-.01em;line-height:1.15}
+  .lead{margin:0 0 28px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:20px}
+  .card{display:block;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--card);color:inherit;text-decoration:none;transition:transform .15s,box-shadow .15s}
+  .card:hover,.card:focus-visible{transform:translateY(-3px);box-shadow:0 10px 30px var(--lift);outline:none}
+  .card:focus-visible{border-color:var(--ink)}
+  .card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--line)}
+  .card div{padding:16px 18px 18px}
+  .card h2{margin:0 0 4px;font-size:20px}
+  .card p{margin:0;color:var(--muted);font-size:14.5px}
+  @media (prefers-reduced-motion:reduce){.card{transition:none}}
 </style>
 </head>
 <body>
-<svg id="stage" viewBox="0 0 1600 900">
-  <defs id="defs">
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc8ff"/><stop offset=".65" stop-color="#d9f2ff"/></linearGradient>
-    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5de6f"/><stop offset="1" stop-color="#62b545"/></linearGradient>
-    <pattern id="fence" width="36" height="56" y="548" patternUnits="userSpaceOnUse">
-      <rect y="18" width="36" height="6" fill="#efe8da"/><rect y="38" width="36" height="6" fill="#efe8da"/>
-      <path d="M9,56 V12 L17,2 L25,12 V56Z" fill="#fffdf6" stroke="#d8cfbd" stroke-width="1.5"/>
-    </pattern>
-  </defs>
-
-  <!-- backdrop -->
-  <rect width="1600" height="900" fill="url(#sky)"/>
-  <circle cx="1390" cy="120" r="96" fill="#fff6c9" opacity=".55"/><circle cx="1390" cy="120" r="58" fill="#ffe173"/>
-  <g fill="#fff" opacity=".92">
-    <g class="cloud" style="animation-duration:120s;animation-delay:-20s"><g transform="translate(0 110)"><ellipse rx="90" ry="34"/><ellipse cx="-58" cy="14" rx="56" ry="24"/><ellipse cx="62" cy="12" rx="64" ry="26"/><ellipse cx="14" cy="-24" rx="50" ry="30"/></g></g>
-    <g class="cloud" style="animation-duration:170s;animation-delay:-95s"><g transform="translate(0 210) scale(.7)"><ellipse rx="90" ry="34"/><ellipse cx="-58" cy="14" rx="56" ry="24"/><ellipse cx="62" cy="12" rx="64" ry="26"/><ellipse cx="14" cy="-24" rx="50" ry="30"/></g></g>
-    <g class="cloud" style="animation-duration:145s;animation-delay:-130s"><g transform="translate(0 70) scale(.85)"><ellipse rx="90" ry="34"/><ellipse cx="-58" cy="14" rx="56" ry="24"/><ellipse cx="62" cy="12" rx="64" ry="26"/><ellipse cx="14" cy="-24" rx="50" ry="30"/></g></g>
-  </g>
-  <path d="M0,560 Q200,430 420,520 T860,500 T1280,490 T1600,520 V900 H0Z" fill="#b4e4ab"/>
-  <path d="M0,580 Q260,500 520,560 T1040,545 T1600,560 V900 H0Z" fill="#93d489"/>
-  <g id="trees"></g>
-  <rect x="0" y="548" width="1600" height="56" fill="url(#fence)"/>
-  <path d="M0,598 Q400,586 800,596 T1600,592 V900 H0Z" fill="url(#grass)"/>
-  <!-- worn ground and sandbox -->
-  <g fill="#d9c58a" opacity=".75">
-    <ellipse cx="370" cy="648" rx="270" ry="20"/><ellipse cx="640" cy="778" rx="200" ry="19"/>
-    <ellipse cx="860" cy="632" rx="130" ry="12"/><ellipse cx="1110" cy="670" rx="70" ry="12"/><ellipse cx="1450" cy="668" rx="60" ry="11"/>
-  </g>
-  <ellipse cx="1230" cy="802" rx="176" ry="48" fill="#c79b57"/><ellipse cx="1230" cy="798" rx="166" ry="42" fill="#efd699"/>
-  <path d="M1150,790 q14,-22 28,0z M1262,812 q18,-28 36,0z" fill="#e2c37d"/>
-  <g id="deco"></g>
-
-  <!-- depth-sorted sprites: equipment and heroes -->
-  <g id="world"></g>
-</svg>
-
-<script>
-const NS='http://www.w3.org/2000/svg', $=id=>document.getElementById(id);
-const R=Math.random, rnd=(a,b)=>a+R()*(b-a), pick=a=>a[R()*a.length|0];
-const svg=(html,parent,cls)=>{const g=document.createElementNS(NS,'g');if(cls)g.setAttribute('class',cls);g.innerHTML=html;parent.appendChild(g);return g};
-
-/* ---------- clay-look helpers ---------- */
-const G=(id,a,b,c)=>`<radialGradient id="${id}" cx=".36" cy=".3" r=".8"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></radialGradient>`;
-$('defs').innerHTML+=[
-  ['pur','#dfc5f6','#bf97e0','#9a70c2'],['blk','#5a5a5a','#232323','#0a0a0a'],['wht','#ffffff','#f3f1ec','#cdc8be'],
-  ['lim','#e9e76a','#c6c934','#9aa31f'],['grn','#84e078','#45b548','#2b8c36'],['leaf','#acd565','#74a83a','#4f8226'],
-  ['brn','#e0a06a','#bb7440','#8f5229'],['tan','#fae7a8','#e9c96f','#c9a548'],['org','#ffb072','#f07f35','#cc5c1c'],
-  ['bush','#8fd07a','#5fae52','#3f8a3e']].map(a=>G(...a)).join('');
-// a rounded bar with a soft highlight along its top
-const tube=(d,w,c='#96562c',hi='#bd7742')=>`<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${hi}" stroke-width="${w*.5}" stroke-linecap="round" stroke-linejoin="round" transform="translate(${-w*.08} ${-w*.14})"/>`;
-const eye=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x+2}" cy="${y+1}" r="${r*.55}" fill="#111"/><circle cx="${x+2-r*.2}" cy="${y+1-r*.22}" r="${r*.18}" fill="#fff"/>`;
-const ink=(x,y)=>`<path d="M${x-9},${y-2} Q${x},${y-9} ${x+9},${y-3} Q${x+6},${y+7} ${x-3},${y+6} Q${x-9},${y+4} ${x-9},${y-2}Z" fill="#111"/><circle cx="${x+3}" cy="${y}" r="2.6" fill="#fff"/>`;
-const chk=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#f47f7a" opacity=".7"/>`;
-
-/* ---------- the eight heroes (origin = feet, y up is negative) ---------- */
-const HEROES=[
-{id:'一',k:.92,sw:52,hip:[0,-22],drop:5,ang:35,wad:5,art:`
-  <g class="leg"><ellipse cx="-22" cy="-7" rx="16" ry="10" fill="url(#pur)"/></g>
-  <g class="leg"><ellipse cx="22" cy="-7" rx="16" ry="10" fill="url(#pur)"/></g>
-  <circle cy="-70" r="62" fill="url(#pur)"/>
-  <ellipse cx="-61" cy="-46" rx="11" ry="16" fill="url(#pur)" transform="rotate(20 -61 -46)"/>
-  <ellipse cx="61" cy="-46" rx="11" ry="16" fill="url(#pur)" transform="rotate(-20 61 -46)"/>
-  <path d="M-46,-34 h17 v-13 h-11 v7 h5 M46,-34 h-17 v-13 h11 v7 h-5" fill="none" stroke="#ead9fa" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cy="-30" r="2.6" fill="#b34a6e"/>
-  <g class="eyes"><circle cx="2" cy="-84" r="31" fill="#3a3562"/><circle cx="2" cy="-84" r="22" fill="#f4cfb2"/><circle cx="2" cy="-84" r="13" fill="#111"/><circle cx="-3" cy="-90" r="4" fill="#fff"/></g>
-  ${tube('M-52,-127 Q0,-136 52,-146 M24,-140 L50,-131',11)}`},
-{id:'丁',k:.8,sw:40,hip:[0,-60],drop:44,ang:80,wad:2,art:`
-  <g class="leg"><path d="M-9,-62 V-12" stroke="#1b1b1b" stroke-width="13" stroke-linecap="round"/><ellipse cx="-14" cy="-7" rx="15" ry="9" fill="url(#blk)"/></g>
-  <g class="leg"><path d="M9,-62 V-12" stroke="#1b1b1b" stroke-width="13" stroke-linecap="round"/><ellipse cx="14" cy="-7" rx="15" ry="9" fill="url(#blk)"/></g>
-  <path d="M-22,-178 H22 L16,-66 Q0,-52 -16,-66Z" fill="url(#wht)"/>
-  <rect x="-72" y="-206" width="144" height="40" rx="20" fill="url(#blk)"/>
-  <g class="eyes">${ink(-9,-138)}${ink(11,-138)}</g>
-  ${tube('M-42,-56 Q8,-90 54,-130 M30,-111 L55,-106',11)}
-  <ellipse cx="-13" cy="-80" rx="12" ry="9" fill="url(#wht)"/><ellipse cx="15" cy="-99" rx="11" ry="9" fill="url(#wht)"/>`},
-{id:'上',k:.82,sw:72,hopper:1,drop:0,art:`
-  ${tube('M-80,-12 Q0,-4 76,-20 M44,-15 L72,-36',20)}
-  <circle cx="-80" cy="-13" r="5" fill="none" stroke="#6b3a1e" stroke-width="2"/>
-  <path d="M-34,-18 C-48,-60 -36,-120 -8,-150 C12,-172 48,-160 45,-128 C43,-108 22,-100 26,-80 C29,-64 50,-46 42,-18 Q4,-10 -34,-18Z" fill="url(#lim)"/>
-  <ellipse cx="38" cy="-68" rx="12" ry="9" fill="url(#lim)"/><ellipse cx="-36" cy="-60" rx="9" ry="12" fill="url(#lim)"/>
-  <g class="eyes">${eye(-4,-120,11)}${eye(19,-114,10)}</g>${chk(-18,-107,5)}`},
-{id:'下',k:.68,sw:44,floater:1,drop:48,art:`
-  ${tube('M-78,-232 Q0,-246 72,-240 M42,-243 L78,-264',14)}
-  <circle cx="-78" cy="-233" r="4" fill="none" stroke="#6b3a1e" stroke-width="2"/>
-  <g class="sway">
-    <path d="M-24,-176 Q-30,-210 -26,-233 M22,-176 Q28,-210 24,-237" fill="none" stroke="#3fae42" stroke-width="18" stroke-linecap="round"/>
-    <path d="M0,-206 C-40,-209 -54,-170 -45,-140 C-39,-116 -31,-100 -27,-84 C-22,-64 -4,-60 6,-70 C24,-86 41,-110 45,-140 C51,-177 36,-205 0,-206Z" fill="url(#grn)"/>
-    <path d="M5,-58 q8,11 0,15 q-8,-4 0,-15z" fill="#3fae42"/>
-    <g class="eyes">${eye(-14,-152,10)}${eye(10,-148,10)}</g>${chk(-29,-140,5)}${chk(26,-135,5)}
-  </g>`},
-{id:'木',k:.68,sw:50,hip:[0,-30],drop:10,ang:55,wad:2,art:`
-  <g class="leg"><path d="M-14,-30 V-10" stroke="#a8663a" stroke-width="14" stroke-linecap="round"/><ellipse cx="-17" cy="-7" rx="15" ry="9" fill="url(#brn)"/></g>
-  <g class="leg"><path d="M14,-30 V-10" stroke="#a8663a" stroke-width="14" stroke-linecap="round"/><ellipse cx="17" cy="-7" rx="15" ry="9" fill="url(#brn)"/></g>
-  ${tube('M-22,-92 Q-46,-84 -66,-68 M22,-92 Q46,-84 66,-68',12,'#a8663a','#c98450')}
-  <circle cx="-74" cy="-60" r="24" fill="url(#leaf)"/><circle cx="74" cy="-60" r="24" fill="url(#leaf)"/>
-  <path d="M-27,-150 Q-34,-84 -30,-42 Q-28,-22 0,-22 Q28,-22 30,-42 Q34,-84 27,-150Z" fill="url(#brn)"/>
-  <path d="M-31,-54 Q0,-44 31,-54 M-18,-49 l-5,13" fill="none" stroke="#7a4424" stroke-width="5" stroke-linecap="round"/>
-  <g class="eyes"><ellipse cx="-10" cy="-100" rx="5.5" ry="11" fill="#45d4ff"/><ellipse cx="10" cy="-100" rx="5.5" ry="11" fill="#45d4ff"/></g>
-  <circle cx="-38" cy="-160" r="38" fill="url(#leaf)"/><circle cx="38" cy="-160" r="38" fill="url(#leaf)"/><circle cy="-204" r="42" fill="url(#leaf)"/>`},
-{id:'人',k:.8,sw:44,hip:[0,-48],drop:30,ang:[118,45],wad:3,art:`
-  <g class="leg"><path d="M-9,-50 L-28,-12" stroke="#e3c266" stroke-width="27" stroke-linecap="round"/></g>
-  <g class="leg"><path d="M9,-50 L28,-12" stroke="#e3c266" stroke-width="27" stroke-linecap="round"/></g>
-  <path d="M-21,-80 Q-30,-50 -22,-36 Q0,-26 22,-36 Q30,-50 21,-80Z" fill="url(#tan)"/>
-  <ellipse cx="-23" cy="-62" rx="9" ry="12" fill="url(#tan)"/><ellipse cx="23" cy="-62" rx="9" ry="12" fill="url(#tan)"/>
-  <circle cy="-114" r="46" fill="url(#tan)"/>
-  <g class="eyes"><circle cx="-15" cy="-114" r="6" fill="#151515"/><circle cx="15" cy="-114" r="6" fill="#151515"/></g>
-  <path d="M-8,-100 Q0,-92 8,-100" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>${chk(-29,-101,9)}${chk(29,-101,9)}`},
-{id:'乙',k:.76,sw:46,hip:[9,-54],drop:40,ang:80,wad:2,art:`
-  <g class="leg"><path d="M0,-56 V-12" stroke="#1b1b1b" stroke-width="12" stroke-linecap="round"/><ellipse cx="-4" cy="-7" rx="14" ry="9" fill="url(#blk)"/></g>
-  <g class="leg"><path d="M18,-56 V-12" stroke="#1b1b1b" stroke-width="12" stroke-linecap="round"/><ellipse cx="23" cy="-7" rx="14" ry="9" fill="url(#blk)"/></g>
-  <rect x="-16" y="-168" width="60" height="126" rx="28" fill="url(#wht)"/>
-  ${tube('M-56,-222 Q-34,-246 10,-240 Q50,-232 36,-196 Q24,-166 -16,-140 Q-50,-116 -40,-86 Q-30,-58 4,-62 Q28,-66 36,-84',24,'#141414','#3a3a3a')}
-  <circle cx="-56" cy="-227" r="3.6" fill="#fff"/>
-  <g class="eyes">${ink(4,-114)}${ink(26,-116)}</g>`},
-{id:'又',k:.66,sw:62,hip:[0,-24],drop:6,ang:35,wad:4,art:`
-  <g class="leg"><ellipse cx="-27" cy="-8" rx="20" ry="11" fill="url(#org)"/></g>
-  <g class="leg"><ellipse cx="27" cy="-8" rx="20" ry="11" fill="url(#org)"/></g>
-  <g fill="url(#org)"><ellipse cx="-86" cy="-98" rx="9" ry="17" transform="rotate(-48 -86 -98)"/><ellipse cx="-95" cy="-80" rx="9" ry="17" transform="rotate(-82 -95 -80)"/><ellipse cx="-90" cy="-61" rx="9" ry="16" transform="rotate(-112 -90 -61)"/><circle cx="-72" cy="-78" r="17"/></g>
-  <path d="M0,-180 C-6,-150 -22,-132 -46,-108 C-82,-72 -76,-18 0,-16 C76,-18 82,-72 46,-108 C22,-132 6,-150 0,-180Z" fill="url(#org)"/>
-  ${tube('M0,-176 V-214 M-32,-264 Q-37,-216 0,-214 Q37,-216 32,-264 M0,-214 V-284',11,'#e9bd90','#f8dcbc')}
-  <ellipse cy="-188" rx="11" ry="7" fill="#f1cfa8" stroke="#d9a877" stroke-width="1.5"/>
-  <g class="eyes"><circle cx="-20" cy="-72" r="11" fill="#8a4513"/><circle cx="-19" cy="-71" r="6.5" fill="#1a0d05"/><circle cx="-23" cy="-75" r="2.6" fill="#fff"/>
-    <circle cx="20" cy="-72" r="11" fill="#8a4513"/><circle cx="21" cy="-71" r="6.5" fill="#1a0d05"/><circle cx="17" cy="-75" r="2.6" fill="#fff"/></g>
-  <path d="M-35,-92 L-12,-82 M35,-92 L12,-82" stroke="#3a1d0a" stroke-width="5" stroke-linecap="round"/>
-  <path d="M-7,-56 Q0,-49 7,-56" fill="none" stroke="#3a1d0a" stroke-width="3" stroke-linecap="round"/>${chk(-38,-58,8)}${chk(38,-58,8)}
-  <circle cx="-40" cy="-36" r="14" fill="url(#org)" stroke="#d2651f" stroke-width="1.5"/><circle cx="40" cy="-36" r="14" fill="url(#org)" stroke="#d2651f" stroke-width="1.5"/>`}
-];
-
-/* ---------- scenery ---------- */
-$('trees').innerHTML=[[40,1.1],[210,.8],[690,.9],[1030,1.05],[1210,.75],[1560,1.15]].map(([x,s])=>`<g transform="translate(${x} 585) scale(${s})"><rect x="-11" y="-95" width="22" height="95" rx="8" fill="#9a6238"/><circle cx="-34" cy="-110" r="44" fill="url(#bush)"/><circle cx="34" cy="-112" r="46" fill="url(#bush)"/><circle cy="-158" r="54" fill="url(#bush)"/></g>`).join('');
-{let d='',f='';const onSand=(x,y)=>((x-1230)/190)**2+((y-800)/56)**2<1;
- for(let i=0;i<60;i++){const x=rnd(10,1590)|0,y=rnd(608,894)|0;if(onSand(x,y))continue;
-   if(i<42)d+=`M${x},${y} q-4,-8 -7,-11 M${x},${y} v-14 M${x},${y} q4,-8 7,-11 `;
-   else f+=`<circle cx="${x}" cy="${y}" r="5" fill="${pick(['#fff','#ffd1e3','#ffe98a','#d8c8ff'])}"/><circle cx="${x}" cy="${y}" r="2" fill="#f5a623"/>`}
- $('deco').innerHTML=`<path d="${d}" fill="none" stroke="#4f9f37" stroke-width="2.6" stroke-linecap="round"/>${f}`}
-
-/* ---------- world: ground band, depth-sorted sprites ---------- */
-const GX0=70,GX1=1530,GY0=614,GY1=856;
-const sc=y=>.78+(y-GY0)/(GY1-GY0)*.32;            // nearer = bigger
-const world=$('world'), sprites=[];
-const sprite=(html,key)=>sprites.push({el:svg(html,world),key});
-const RED=['#d9483b','#f47a6c'],BLU=['#3572d4','#6b9ff0'],YEL=['#f0b22c','#ffd768'],WOOD=['#c08146','#dea468'];
-const SW={px:[280,460],py:398,L:176};
-
-// swing set
-sprite(tube('M112,642 L150,398 L188,642 M552,642 L590,398 L628,642',12,...RED)+tube('M136,398 H604',14,...RED)+
-  SW.px.map((x,i)=>`<g id="sw${i}"><path d="M${x-24},400 V574 M${x+24},400 V574" stroke="#b98f5a" stroke-width="4"/><rect x="${x-37}" y="572" width="74" height="11" rx="5.5" fill="#3572d4"/><rect x="${x-33}" y="573.5" width="66" height="3.5" rx="1.7" fill="#6b9ff0"/></g>`).join(''),640);
-// bench
-sprite(`<path d="M772,628 V552 M948,628 V552" stroke="#6b4a2e" stroke-width="9" stroke-linecap="round"/>`+tube('M760,558 H960 M760,576 H960',13,...WOOD)+tube('M752,594 H968',14,...WOOD),626);
-// slide
-{let rungs='';for(let j=1;j<=6;j++){const y=664-j*28,x=1492-46*(j*28/190);rungs+=`M${x-24},${y} h24 `}
- sprite(tube('M1372,662 V436 M1432,662 V436',10,...BLU)+`<path d="M1352,440 L1402,396 L1452,440Z" fill="#e25446" stroke="#c63e31" stroke-width="3" stroke-linejoin="round"/>`+
-  tube('M1492,664 L1446,474 M1468,664 L1422,474',7,...BLU)+tube(rungs,5,'#8aa9d9','#c2d6f5')+
-  tube('M1372,474 C1300,500 1260,640 1118,646',26,...YEL)+tube('M1362,474 H1446',10,...RED),660)}
-// seesaw
-sprite(`<path d="M610,774 L640,724 L670,774Z" fill="#3572d4" stroke="#2a5db3" stroke-width="3" stroke-linejoin="round"/><g id="saw">`+
-  tube('M476,728 H804',13,...RED)+tube('M548,722 v-24 m-10,0 h20 M732,722 v-24 m-10,0 h20',5,'#4a4a4a','#8a8a8a')+
-  `</g><circle cx="640" cy="728" r="7" fill="#ffd768" stroke="#c98f1a" stroke-width="2"/>`,770);
-const swEl=[$('sw0'),$('sw1')], sawEl=$('saw'), saw={ang:-12,tau:0,rest:-12};
-
-// places a hero can use
-const slots=[];
-SW.px.forEach((x,i)=>slots.push({kind:'swing',i,ax:x,ay:654,base:641,amp:0,tau:0,ang:0}));
-[-1,1].forEach(s=>slots.push({kind:'saw',side:s,ax:640+s*132,ay:786,base:771}));
-[800,860,920].forEach(x=>slots.push({kind:'bench',x,ax:x,ay:640,base:627}));
-slots.push({kind:'slide',ax:1478,ay:672,base:661});
-
-/* ---------- heroes ---------- */
-const heroes=HEROES.map((d,i)=>{
-  const el=svg(`<ellipse class="sh" rx="${d.sw}" ry="${d.sw*.22}" fill="#1c3a12" opacity=".22"/><g class="flip"><g class="body">${d.art}</g></g>`,world,'hero');
-  const h={...d,el,i,x:rnd(GX0+80,GX1-80),y:rnd(GY0,GY1),dir:R()<.5?1:-1,ph:R()*6,hopT:0,rot:0,st:'idle',t:rnd(.2,2.5),key:0,
-    flip:el.querySelector('.flip'),body:el.querySelector('.body'),legs:[...el.querySelectorAll('.leg')],sway:el.querySelector('.sway'),sh:el.querySelector('.sh')};
-  el.querySelectorAll('.eyes').forEach(e=>e.style.animationDelay=-rnd(0,4.6)+'s');
-  el.addEventListener('pointerdown',()=>{if(h.hopT<=0)h.hopT=.45});
-  sprites.push(h);return h});
-sprites.forEach((s,n)=>s.n=n);
-
-const go=(h,st,t)=>{h.st=st;h.t=t};
-const free=h=>h.st==='idle'||h.st==='walk'||h.st==='sit';
-const release=h=>{if(h.slot){h.slot.who=null;h.slot.on=false;h.slot=null}h.then=null};
-function walkTo(h,x,y,spd,then){h.tx=x;h.ty=y;h.spd=spd;h.then=then;go(h,'walk',45)}
-function step(h,dt){
-  const dx=h.tx-h.x,dy=h.ty-h.y,d=Math.hypot(dx,dy),v=h.spd*sc(h.y)*dt;
-  if(Math.abs(dx)>2)h.dir=dx>0?1:-1;
-  h.ph+=dt*h.spd*.085;
-  if(d<=v){h.x=h.tx;h.y=h.ty;return true}
-  h.x+=dx/d*v;h.y+=dy/d*v;return false}
-
-function goSlot(h,s){
-  s.who=h;s.on=false;h.slot=s;
-  walkTo(h,s.ax,s.ay,85,()=>{
-    s.on=true;h.hopT=.3;go(h,'use',s.kind==='slide'?3.1:rnd(8,13));
-    if(s.kind==='saw'){const o=slots.find(q=>q.kind==='saw'&&q!==s);if(o.on)o.who.t=h.t=rnd(8,12)}
-    if(s.kind==='bench')h.dir=R()<.5?1:-1})}
-
-function chase(h,o,round=0){
-  release(h);release(o);h.other=o;o.other=h;h.round=round;h.wait=round?.9:0;
-  go(h,'chase',9);h.spd=185;go(o,'flee',9);o.spd=165;o.rt=0}
-function fleePoint(h,c){
-  let best,bs=-1e9;
-  for(let i=0;i<8;i++){const x=rnd(GX0,GX1),y=rnd(GY0,GY1);
-    let v=Math.hypot(x-c.x,y-c.y)-.4*Math.hypot(x-h.x,y-h.y);
-    if((x-h.x)*(c.x-h.x)+(y-h.y)*(c.y-h.y)>0)v-=300;      // don't run at the chaser
-    if(v>bs){bs=v;best=[x,y]}}
-  h.tx=best[0];h.ty=best[1];h.rt=rnd(1,1.8)}
-
-function think(h){
-  const saws=slots.filter(s=>s.kind==='saw'),open=saws.find(s=>!s.who);
-  if(open&&saws.some(s=>s.on)&&R()<.7)return goSlot(h,open);   // someone is waiting on the seesaw
-  const r=R();
-  if(r<.38){const f=slots.filter(s=>!s.who);if(f.length)return goSlot(h,pick(f))}
-  else if(r<.55){const c=heroes.filter(o=>o!==h&&free(o));if(c.length)return chase(h,pick(c))}
-  else if(r<.66)return go(h,'sit',rnd(4,8));
-  walkTo(h,rnd(GX0,GX1),rnd(GY0,GY1),85,()=>go(h,'idle',rnd(.4,2.2)))}
-
-const SLIDE=[[1384,462],[1304,488],[1262,628],[1118,634]];
-function useSlot(h,s){
-  h.sit=true;
-  if(s.kind==='swing'){const a=s.ang*Math.PI/180;h.px=SW.px[s.i]+SW.L*Math.sin(a);h.py=SW.py+SW.L*Math.cos(a);h.rot=-s.ang}
-  else if(s.kind==='saw'){const a=saw.ang*Math.PI/180,lx=s.side*132,ly=-7;
-    h.px=640+lx*Math.cos(a)-ly*Math.sin(a);h.py=728+lx*Math.sin(a)+ly*Math.cos(a);h.rot=saw.ang;h.dir=-s.side}
-  else if(s.kind==='bench'){h.px=s.x;h.py=588}
-  else{const e=3.1-h.t;h.dir=-1;
-    if(e<1.4){const u=e/1.4;h.sit=false;h.moving=true;h.ph+=.2;h.px=1478-74*u;h.py=668-200*u}      // climb the ladder
-    else{const u=Math.min(1,Math.max(0,(e-1.9)/1.2))**1.7,v=1-u,P=SLIDE,                            // then ride the chute
-      B=k=>v*v*v*P[0][k]+3*v*v*u*P[1][k]+3*v*u*u*P[2][k]+u*u*u*P[3][k],
-      D=k=>3*v*v*(P[1][k]-P[0][k])+6*v*u*(P[2][k]-P[1][k])+3*u*u*(P[3][k]-P[2][k]);
-      h.px=B(0);h.py=B(1);h.rot=(Math.atan2(D(1),D(0))*180/Math.PI-180)*.5}}   // lean with the slope, but stay mostly upright
-  if(h.t<=0){s.on=false;s.who=null;h.slot=null;h.x=s.kind==='slide'?1090:s.ax;h.y=s.kind==='slide'?668:s.ay;h.hopT=.35;go(h,'idle',rnd(.4,1.5))}}
-
-function equip(dt){
-  slots.forEach(s=>{if(s.kind!=='swing')return;
-    const want=s.on&&s.who.t>1.6?24:0;s.amp+=(want-s.amp)*Math.min(1,dt*(want?.9:1.3));s.tau+=dt;
-    s.ang=s.amp*Math.sin(s.tau*2.3+s.i*1.3);
-    swEl[s.i].setAttribute('transform',`rotate(${(-s.ang).toFixed(2)} ${SW.px[s.i]} ${SW.py})`)});
-  const [a,b]=slots.filter(s=>s.kind==='saw'),both=a.on&&b.on;
-  if(both)saw.tau+=dt;else if(a.on||b.on)saw.rest=a.on?-12:12;
-  saw.ang+=((both?12*Math.sin(saw.tau*2.6):saw.rest)-saw.ang)*Math.min(1,dt*5);
-  sawEl.setAttribute('transform',`rotate(${saw.ang.toFixed(2)} 640 728)`)}
-
-function update(h,dt){
-  h.t-=dt;h.sit=h.moving=false;h.rot=0;h.px=h.py=null;
-  switch(h.st){
-    case 'idle': if(h.t<=0)think(h);break;
-    case 'sit': h.sit=true;if(h.t<=0)go(h,'idle',.5);break;
-    case 'walk': h.moving=true;
-      if(step(h,dt)){const f=h.then;h.then=null;f?f():go(h,'idle',1)}
-      else if(h.t<=0){release(h);go(h,'idle',1)}
-      break;
-    case 'chase':{const o=h.other;if(h.wait>0){h.wait-=dt;break}
-      h.moving=true;h.tx=o.x;h.ty=o.y;step(h,dt);
-      if(Math.hypot(o.x-h.x,o.y-h.y)<48*sc(h.y)){h.hopT=o.hopT=.45;                // tag!
-        if(h.round<1&&R()<.75)chase(o,h,h.round+1);else{go(h,'idle',rnd(.6,1.6));go(o,'idle',rnd(.6,1.6))}}
-      else if(h.t<=0){go(h,'idle',1);go(o,'idle',1)}
-      break}
-    case 'flee': h.moving=true;h.rt-=dt;if(h.rt<=0||step(h,dt))fleePoint(h,h.other);break;
-    case 'use': useSlot(h,h.slot);break}}
-
-function draw(h,T,dt){
-  if(h.hopT>0)h.hopT-=dt;
-  const using=h.st==='use',gy=using?h.slot.base:h.y,s=h.k*sc(gy),x=h.px??h.x,y=h.py??h.y,p=h.ph;
-  h.key=gy;
-  h.el.setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${h.rot.toFixed(1)}) scale(${s.toFixed(3)})`);
-  h.flip.setAttribute('transform',`scale(${h.dir} 1)`);
-  let by=h.sit?h.drop:0,tilt=0;
-  if(h.hopT>0)by-=Math.sin(Math.PI*(1-h.hopT/.45))*26;
-  if(h.moving){if(h.hopper){by-=Math.abs(Math.sin(p))*14;tilt=Math.sin(p*2)*3}else{by-=Math.abs(Math.sin(p))*3;tilt=Math.sin(p)*(h.wad||2)}}
-  if(h.floater)by+=Math.sin(T*2.4+h.i)*4;
-  const br=1+Math.sin(T*2+h.i)*.012;
-  h.body.setAttribute('transform',`translate(0 ${by.toFixed(1)}) rotate(${tilt.toFixed(1)}) scale(${(2-br).toFixed(3)} ${br.toFixed(3)})`);
-  h.legs.forEach((l,j)=>{const q=p+j*Math.PI;
-    l.setAttribute('transform',h.sit?`rotate(${-(h.ang[j]??h.ang)} ${h.hip[0]} ${h.hip[1]})`:
-      h.moving?`translate(${(Math.sin(q)*7).toFixed(1)} ${(-Math.max(0,Math.cos(q))*7).toFixed(1)})`:'')});
-  if(h.sway)h.sway.setAttribute('transform',`rotate(${(Math.sin(T*2.6+h.i)*(h.moving?8:3)).toFixed(1)} 0 -238)`);
-  h.sh.style.display=using?'none':''}
-
-let order='';
-function sortDepth(){
-  const a=[...sprites].sort((p,q)=>p.key-q.key),sig=a.map(s=>s.n).join();
-  if(sig!==order){order=sig;a.forEach(s=>world.appendChild(s.el))}}
-
-// ?lineup shows the cast standing in a row (for comparing against the reference art)
-if(location.search.includes('lineup'))heroes.forEach((h,i)=>{h.x=150+i*186;h.y=830;h.dir=1;go(h,'pose',1e9)});
-
-const fit=()=>$('stage').setAttribute('preserveAspectRatio',innerWidth/innerHeight>=16/9?'xMidYMax slice':'xMidYMid meet');
-fit();addEventListener('resize',fit);
-
-let last=performance.now();
-function frame(now){
-  const dt=Math.min(.05,(now-last)/1000),T=now/1000;last=now;
-  equip(dt);heroes.forEach(h=>update(h,dt));heroes.forEach(h=>draw(h,T,dt));sortDepth();
-  requestAnimationFrame(frame)}
-requestAnimationFrame(frame);
-</script>
+<main>
+  <h1>Hanzi Playground</h1>
+  <p class="lead">Eight Hanzi Heroes — 一 丁 上 下 木 人 乙 又 — at play. Choose a version.</p>
+  <div class="grid">
+    <a class="card" href="2d.html">
+      <img src="assets/preview-2d.jpg" alt="The heroes on swings and a seesaw in a flat, illustrated playground">
+      <div><h2>2D version</h2><p>A flat illustrated playground. Light, and runs on any device.</p></div>
+    </a>
+    <a class="card" href="3d.html">
+      <img src="assets/preview-3d.jpg" alt="The heroes as clay models in a sunlit 3D park">
+      <div><h2>3D version</h2><p>Clay heroes in a sunlit park. Drag to look around.</p></div>
+    </a>
+  </div>
+</main>
 </body>
 </html>
