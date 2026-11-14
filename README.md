@@ -42,4 +42,5 @@ Both versions share the same behaviour. A small state machine (`idle`, `walk`, `
 - Phones and other touch devices start on a lighter profile: fewer grass blades and leaves, a smaller shadow map, lower resolution and no depth of field. Add `?lite` or `?full` to the address to force one profile or the other.
 - If the frame rate drops, the page lowers its own quality in steps: resolution first, then depth of field, grass density and finally shadows. Add `?fixed` to the address to turn that off.
 - On a portrait screen the camera moves back and looks from higher up so the whole playground fits.
-- While the scene loads it says so, and if it cannot start it shows the reason and a link to the 2D version.
+- While the scene loads it names the step it is on, and if it cannot start it shows the reason and a link to the 2D version.
+- Crash guard: each loading step is saved in the browser. If a visit dies before the scene has run for a few seconds, the next visit starts one profile lower (full, then lite, then safe), shows where the last one stopped, and remembers the lower profile. Safe mode has no shadows, a plain sky and little grass. If safe mode also dies, the page asks before trying again. Add `?safe` to force safe mode, or `?reset` to forget a remembered downgrade.
