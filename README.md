@@ -39,4 +39,7 @@ Both versions share the same behaviour. A small state machine (`idle`, `walk`, `
 - Each hero is modelled from spheres, lathe shapes and swept limbs in a matte clay material, one entry each in the `HEROES` array.
 - The scene is lit by a physical sky and a late-afternoon sun with soft shadows. Grass is about 100,000 blades that sway in the wind; trees are leaf cards that cast dappled shade.
 - A depth-of-field pass keeps the playground sharp and softens the distance.
-- If the frame rate drops, the page lowers its own quality in steps: resolution first, then depth of field, then grass density. Add `?fixed` to the address to turn that off.
+- Phones and other touch devices start on a lighter profile: fewer grass blades and leaves, a smaller shadow map, lower resolution and no depth of field. Add `?lite` or `?full` to the address to force one profile or the other.
+- If the frame rate drops, the page lowers its own quality in steps: resolution first, then depth of field, grass density and finally shadows. Add `?fixed` to the address to turn that off.
+- On a portrait screen the camera moves back and looks from higher up so the whole playground fits.
+- While the scene loads it says so, and if it cannot start it shows the reason and a link to the 2D version.

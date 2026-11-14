@@ -14,14 +14,28 @@
   canvas{display:block;touch-action:none}
   #back{position:fixed;left:14px;top:12px;font:13px system-ui,sans-serif;color:#fff;text-decoration:none;opacity:.85;text-shadow:0 1px 3px #0009}
   #back:hover{opacity:1;text-decoration:underline}
-  #hint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);font:13px system-ui,sans-serif;color:#fff;opacity:.8;text-shadow:0 1px 3px #0009;pointer-events:none;white-space:nowrap}
+  #msg{position:fixed;inset:0;z-index:2;display:grid;place-items:center;padding:24px;text-align:center;font:16px/1.7 system-ui,sans-serif;color:#22303a;background:#bcd9ee}
+  #msg[hidden]{display:none}
+  #msg a{color:inherit;font-weight:600}
+  #msg small{opacity:.7}
+  #hint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);font:13px system-ui,sans-serif;color:#fff;opacity:.8;text-shadow:0 1px 3px #0009;pointer-events:none;width:max-content;max-width:94vw;text-align:center}
 </style>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script>
+<script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js"></script>   <!-- import maps for browsers that lack them -->
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script>
 </head>
 <body>
 <a id="back" href="index.html">← Versions</a>
 <div id="hint">Drag to look around · scroll to zoom · click a hero</div>
-<script type="module">
+<div id="msg">Loading the 3D scene…</div>
+<script>
+// Says so, and offers the 2D version, when the 3D scene cannot start.
+function fail(why){if(window.__ok)return;const m=document.getElementById('msg');
+  m.innerHTML='<div>The 3D version could not start on this device.<br><small></small><br><a href="2d.html">Open the 2D version</a></div>';m.querySelector('small').textContent=why||'';m.hidden=false}
+addEventListener('error',e=>fail(e.message));
+addEventListener('unhandledrejection',e=>fail(String(e.reason&&e.reason.message||e.reason)));
+setTimeout(()=>fail('It is taking too long to load. Check the connection and reload.'),25000);
+</script>
+<script type="module" onerror="fail('The 3D engine could not be downloaded.')">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {Sky} from 'three/addons/objects/Sky.js';
@@ -32,12 +46,14 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 
 const R=Math.random, rnd=(a,b)=>a+R()*(b-a), pick=a=>a[R()*a.length|0], TAU=Math.PI*2;
 const V3=(x,y,z)=>new THREE.Vector3(x,y,z), F32=(a,n)=>new THREE.Float32BufferAttribute(a,n);
-const LINEUP=location.search.includes('lineup');   // ?lineup stands the cast in a row
+const QS=location.search, LINEUP=QS.includes('lineup');   // ?lineup stands the cast in a row
+// phones and other weak devices start on a lighter profile; ?lite and ?full force one or the other
+const TOUCH=matchMedia('(pointer:coarse)').matches, LITE=QS.includes('lite')||!QS.includes('full')&&(TOUCH||Math.min(screen.width,screen.height)<700||(navigator.deviceMemory||8)<4);
 
 /* ---------- renderer, camera, sky and sun ---------- */
 const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.setPixelRatio(Math.min(devicePixelRatio,LITE?1.5:2));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=LITE?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.5;
 document.body.appendChild(renderer.domElement);
 const scene=new THREE.Scene(); scene.fog=new THREE.Fog(0xd5e2ea,40,210);
@@ -55,7 +71,7 @@ const sky=new Sky(); sky.scale.setScalar(450);
 {const u=sky.material.uniforms;u.turbidity.value=2.5;u.rayleigh.value=2.2;u.mieCoefficient.value=.004;u.mieDirectionalG.value=.85;u.sunPosition.value.copy(sunDir);
  const es=new THREE.Scene();es.add(sky);scene.environment=new THREE.PMREMGenerator(renderer).fromScene(es,0,.1,1000).texture;scene.environmentIntensity=.7;scene.add(sky)}
 const sun=new THREE.DirectionalLight(0xffedd6,5); sun.position.copy(sunDir).multiplyScalar(45); sun.castShadow=true;
-{const c=sun.shadow.camera;c.left=-24;c.right=24;c.top=20;c.bottom=-20;c.near=1;c.far=110;sun.shadow.mapSize.set(4096,4096);sun.shadow.bias=-.0004;sun.shadow.normalBias=.03;sun.shadow.radius=3}
+{const c=sun.shadow.camera;c.left=-24;c.right=24;c.top=20;c.bottom=-20;c.near=1;c.far=110;sun.shadow.mapSize.setScalar(LITE?2048:4096);sun.shadow.bias=-.0004;sun.shadow.normalBias=.03;sun.shadow.radius=3}
 scene.add(sun,new THREE.HemisphereLight(0xcfe6ff,0x6b8f3a,.4));
 
 /* ---------- procedural textures ---------- */
@@ -127,7 +143,7 @@ function bare(x,z){   // 0 = full grass, 1 = none
 {const g=new THREE.Mesh(new THREE.PlaneGeometry(700,700),new THREE.MeshStandardMaterial({map:groundTex,roughness:1}));g.rotation.x=-Math.PI/2;g.receiveShadow=true;scene.add(g);
  const dm=new THREE.MeshStandardMaterial({map:dirtTex,transparent:true,depthWrite:false,roughness:1});
  for(const[cx,cz,rx,rz]of PATCH){const d=new THREE.Mesh(new THREE.CircleGeometry(1,40),dm);d.rotation.x=-Math.PI/2;d.scale.set(rx*1.25,rz*1.25,1);d.position.set(cx,.012,cz);d.receiveShadow=true;scene.add(d)}}
-{const N=110000,w=.026,g=new THREE.BufferGeometry();
+{const N=LITE?45000:110000,w=LITE?.038:.026,g=new THREE.BufferGeometry();
  g.setAttribute('position',F32([-w,0,0,w,0,0,-w*.75,.5,0,w*.75,.5,0,0,1,0],3));
  g.setAttribute('normal',F32([0,1,0,0,1,0,0,1,0,0,1,0,0,1,0],3));
  g.setAttribute('color',F32([.3,.42,.16,.3,.42,.16,.7,.8,.45,.7,.8,.45,1,1,.8],3));
@@ -136,7 +152,7 @@ function bare(x,z){   // 0 = full grass, 1 = none
  windPatch(m,`vec4 wp=instanceMatrix*vec4(0.,0.,0.,1.);float wv=sin(uTime*1.7+wp.x*.6+wp.z*.8)*.6+sin(uTime*3.1+wp.x*2.1-wp.z*1.3)*.25;
    transformed.x+=wv*position.y*position.y*.22;transformed.z+=wv*position.y*position.y*.12;`);
  const mesh=new THREE.InstancedMesh(g,m,N),o=new THREE.Object3D(),c=new THREE.Color();let n=0;
- for(let i=0;i<N;i++){const x=rnd(-13.5,13.5),z=rnd(-8.5,8.5),b=bare(x,z);if(R()<b)continue;
+ for(let i=0;i<N;i++){const x=rnd(-13.5,13.5),z=rnd(-8.5,11),b=bare(x,z);if(R()<b)continue;
    o.position.set(x,0,z);o.rotation.set(rnd(-.3,.3),R()*TAU,rnd(-.3,.3));o.scale.set(rnd(.8,1.5),rnd(.11,.28)*(1-.5*b),1);o.updateMatrix();
    mesh.setMatrixAt(n,o.matrix);mesh.setColorAt(n++,c.setHSL(rnd(.21,.3),rnd(.4,.62),rnd(.27,.42)))}
  mesh.count=n;mesh.receiveShadow=true;mesh.frustumCulled=false;scene.add(mesh);window.grass=mesh}
@@ -153,7 +169,7 @@ const barkMat=new THREE.MeshStandardMaterial({color:0x6b4a32,roughness:.95,bumpM
 const leafMat=new THREE.MeshStandardMaterial({map:leafTex,vertexColors:true,alphaTest:.4,side:THREE.DoubleSide,roughness:.75});
 windPatch(leafMat,`float wv=sin(uTime*1.4+position.x*.8+position.y*1.3)*.5+sin(uTime*2.6+position.z*1.7)*.3;transformed.x+=wv*.05;transformed.y+=wv*.02;`);
 const leafDepth=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,map:leafTex,alphaTest:.4});   // so leaves cast dappled shadows
-function tree(x,z,s,cards=230){
+function tree(x,z,s,cards=LITE?130:230){
   const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(s);g.rotation.y=R()*TAU;
   g.add(limb(barkMat,[[0,-.2,0],[.12,1.3,.05],[-.06,2.5,0],[.1,3.6,.1]],[.36,.27,.2,.1]));
   const cs=[];
@@ -170,7 +186,7 @@ function tree(x,z,s,cards=230){
   const bg=new THREE.BufferGeometry();bg.setAttribute('position',F32(P,3));bg.setAttribute('normal',F32(Nn,3));bg.setAttribute('uv',F32(UV,2));bg.setAttribute('color',F32(Cc,3));bg.setIndex(I);
   const f=new THREE.Mesh(bg,leafMat);f.castShadow=true;f.customDepthMaterial=leafDepth;g.add(f);scene.add(g)}
 [[-9,-13,1.3],[1,-15.5,1.5],[10.5,-12.5,1.35],[-14.5,-4,1.3],[14.5,-5,1.3],[-9.5,7.5,1.7]].forEach(t=>tree(...t));   // the last one stands off-camera and shades the lawn
-for(let i=0;i<22;i++){const a=rnd(-.1,1.1)*Math.PI,r=rnd(24,48);tree(Math.cos(a)*r,-Math.sin(a)*r*.85-6,rnd(1.2,1.9),100)}   // woods beyond the fence
+for(let i=0;i<(LITE?10:22);i++){const a=rnd(-.1,1.1)*Math.PI,r=rnd(24,48);tree(Math.cos(a)*r,-Math.sin(a)*r*.85-6,rnd(1.2,1.9),LITE?60:100)}   // woods beyond the fence
 {const ig=new THREE.SphereGeometry(1,20,14),p=ig.attributes.position;
  for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),n=1+.18*Math.sin(x*5.1+y*3.3)*Math.cos(z*4.7+y*2.1);p.setXYZ(i,x*n,y*n,z*n)}ig.computeVertexNormals();
  const wm=new THREE.InstancedMesh(ig,new THREE.MeshStandardMaterial({roughness:1}),16),o=new THREE.Object3D(),c=new THREE.Color();   // low hills on the horizon
@@ -410,20 +426,30 @@ class DofPass extends Pass{
         gl_FragColor=c/17.;}`});
     this.quad=new FullScreenQuad(this.mat)}
   render(r,writeBuffer,readBuffer){const u=this.mat.uniforms;u.tColor.value=readBuffer.texture;u.tDepth.value=readBuffer.depthTexture;r.setRenderTarget(this.renderToScreen?null:writeBuffer);this.quad.render(r)}}
-const composer=new EffectComposer(renderer,new THREE.WebGLRenderTarget(1,1,{samples:4,type:THREE.HalfFloatType,depthTexture:new THREE.DepthTexture(1,1)}));
-const dofPass=new DofPass();
-composer.addPass(new RenderPass(scene,camera));composer.addPass(dofPass);composer.addPass(new OutputPass());
-// adaptive quality: if the frame rate sags, step down (resolution first, then depth of field, then grass) until it holds
-let dof=!location.search.includes('nodof'),qi=0,qn=0,qt=0;
-const pr0=Math.min(devicePixelRatio,2),setPR=r=>{if(r>=renderer.getPixelRatio())return false;renderer.setPixelRatio(r);fit()};
-const STEPS=[()=>setPR(1.5),()=>setPR(1.25),()=>setPR(1),()=>{dof=false},()=>{grass.count>>=1},()=>setPR(.75)];
-const ADAPT=!location.search.includes('fixed');window.Q=()=>({dof,step:qi,pr:renderer.getPixelRatio(),grass:grass.count});
+let dof=!LITE&&!QS.includes('nodof'),composer,dofPass;
+if(dof){composer=new EffectComposer(renderer,new THREE.WebGLRenderTarget(1,1,{samples:4,type:THREE.HalfFloatType,depthTexture:new THREE.DepthTexture(1,1)}));
+  dofPass=new DofPass();composer.addPass(new RenderPass(scene,camera));composer.addPass(dofPass);composer.addPass(new OutputPass())}
+// adaptive quality: if the frame rate sags, step down (resolution, depth of field, grass, then shadows) until it holds
+let qi=0,qn=0,qt=0;
+const setPR=r=>{if(r>=renderer.getPixelRatio())return false;renderer.setPixelRatio(r);fit()};
+const STEPS=[()=>setPR(1.5),()=>setPR(1.25),()=>setPR(1),()=>{if(!dof)return false;dof=false},()=>{grass.count>>=1},()=>setPR(.75),()=>{sun.castShadow=false}];
+const ADAPT=!QS.includes('fixed');window.Q=()=>({lite:LITE,dof,step:qi,pr:renderer.getPixelRatio(),grass:grass.count,fov:Math.round(camera.fov),dist:+camera.position.distanceTo(controls.target).toFixed(1)});
 function quality(raw,T){
   if(!ADAPT||T<2||raw>.25){qn=qt=0;return}
   qn++;qt+=raw;if(qn<45)return;
   if(qn/qt<42)while(qi<STEPS.length&&STEPS[qi++]()===false);
   qn=qt=0}
-function fit(){const a=innerWidth/innerHeight;camera.aspect=a;camera.fov=a>=1.7?36:2*Math.atan(Math.tan(18*Math.PI/180)*1.7/a)*180/Math.PI;camera.updateProjectionMatrix();dofPass.mat.uniforms.aspect.value=a;renderer.setSize(innerWidth,innerHeight);composer.setPixelRatio(renderer.getPixelRatio());composer.setSize(innerWidth,innerHeight)}
+let wasTall=null;
+function fit(){const a=innerWidth/innerHeight;camera.aspect=a;
+  camera.fov=a>=1.7?36:Math.min(56,2*Math.atan(Math.tan(18*Math.PI/180)*1.7/a)*180/Math.PI);
+  const tall=a<1,need=(tall?7:9.4)/(Math.tan(camera.fov*Math.PI/360)*a);
+  if(!LINEUP&&(tall!==wasTall||need>camera.position.distanceTo(controls.target)+.5)){   // frame the playground again when the screen turns or gets too narrow; a tall screen looks from higher up
+    const el=tall?.52:.132,d=Math.max(need,16.65);camera.position.set(0,1.4+d*Math.sin(el),-1+d*Math.cos(el));controls.maxDistance=Math.max(24,d+8)}
+  wasTall=tall;
+  camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);
+  if(composer){dofPass.mat.uniforms.aspect.value=a;composer.setPixelRatio(renderer.getPixelRatio());composer.setSize(innerWidth,innerHeight)}
+  if(TOUCH)document.getElementById('hint').textContent='Drag to look around · pinch to zoom · tap a hero'+(a<1?' · turn the phone sideways for a closer view':'')}
+renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();window.__ok=false;fail('The graphics were interrupted. Reload to try again.')});
 fit();addEventListener('resize',fit);
 Object.assign(window,{heroes,slots,goSlot,go,camera,controls,dofPass});   // handy in the console
 
@@ -436,7 +462,8 @@ renderer.setAnimationLoop(()=>{
   heroes.forEach(h=>pose(h,T,dt));
   for(const c of clouds){c.position.x+=dt*1.2;if(c.position.x>280)c.position.x=-280}
   controls.update();
-  if(dof){dofPass.mat.uniforms.focus.value=camera.position.distanceTo(controls.target)+.5;composer.render()}else renderer.render(scene,camera)});
+  if(dof){dofPass.mat.uniforms.focus.value=camera.position.distanceTo(controls.target)+.5;composer.render()}else renderer.render(scene,camera);
+  if(!window.__ok){window.__ok=true;document.getElementById('msg').hidden=true}});   // first frame is on screen
 </script>
 </body>
 </html>
