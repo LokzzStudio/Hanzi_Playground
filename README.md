@@ -1,6 +1,6 @@
 # Hanzi Playground
 
-The eight Hanzi Heroes — 一 丁 上 下 木 人 乙 又 — at play in a playground, in a 2D version and a 3D version.
+The eight Hanzi Heroes — 一 丁 上 下 木 人 乙 又 — at play in a playground, in a 2D, a 3D and a 2.5D version.
 
 ![The heroes as clay models in a sunlit 3D park](assets/preview-3d.jpg)
 
@@ -12,17 +12,18 @@ Live at **https://lokzzstudio.github.io/Hanzi_Playground/**
 
 | File | What it is |
 | --- | --- |
-| `index.html` | Entry page: choose the 2D or the 3D version. |
+| `index.html` | Entry page: choose the 2D, 3D or 2.5D version. |
 | `2d.html` | Flat illustrated playground in SVG. One self-contained file with no dependencies. |
 | `3d.html` | 3D park built with three.js. Drag to look around, scroll to zoom. |
+| `hybrid.html` | 2.5D version: an illustrated SVG backdrop with real-time 3D clay heroes standing in it. Light enough for phones. |
 
 ## Run it
 
 Open `index.html` in any modern browser. There is no build step.
 
-The 3D version loads three.js from the jsDelivr CDN, so it needs an internet connection. The 2D version works offline.
+The 3D and 2.5D versions load three.js from the jsDelivr CDN, so they need an internet connection. The 2D version works offline.
 
-Add `?lineup` to the address of either version to see the whole cast standing in a row.
+Add `?lineup` to the address of any version to see the whole cast standing in a row.
 
 ## Publishing
 
@@ -30,9 +31,11 @@ Every push to `main` deploys the repo to GitHub Pages through `.github/workflows
 
 ## How it is built
 
-Both versions share the same behaviour. A small state machine (`idle`, `walk`, `sit`, `chase`, `flee`, `use`) drives each hero. Swings, seesaw ends, bench seats and the slide are *slots*: a hero claims a free slot, walks to it and rides it.
+All versions share the same behaviour. A small state machine (`idle`, `walk`, `sit`, `chase`, `flee`, `use`) drives each hero. Swings, seesaw ends, bench seats and the slide are *slots*: a hero claims a free slot, walks to it and rides it.
 
 **2D** — The characters are hand-written SVG with radial-gradient shading for a clay look, one entry each in the `HEROES` array. Heroes and equipment are sorted by their ground line on every frame, so nearer things draw in front.
+
+**2.5D** — Two layers share one 1600×900 box and one fit rule. Underneath, an inline SVG paints the static scenery (sky, hills, trees, fence, lawn, sandbox, cast shadows). On top, a transparent three.js canvas with an orthographic camera maps one world unit to one SVG pixel. The heroes are the 3D clay models from the 3D version. Each piece of equipment is drawn as SVG, rasterised once into a texture and stood on a flat plane, so swings and the seesaw pivot in the screen plane. Everything is painter-sorted by ground line as in 2D: each sprite gets a `renderOrder`, and the depth buffer is cleared between sprites so heroes never intersect each other or the equipment. There are no shadow maps or post-processing, and the pixel ratio is capped at 2.
 
 **3D** — Everything is generated in code; there are no model or image files.
 
