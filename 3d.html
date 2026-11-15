@@ -423,7 +423,7 @@ function pose(h,T,dt){
   h.root.position.set(x,(h.py??0)+hop,z);h.root.rotation.set(h.tiltX,0,h.tiltZ);
   let d=h.yawT-h.yaw;d=Math.atan2(Math.sin(d),Math.cos(d));h.yaw+=d*Math.min(1,dt*(using?20:9));h.turn.rotation.y=h.yaw;
   let by=h.sit?-h.drop:0,rx=0,rz=0;
-  if(h.moving){if(h.hopper){by+=Math.abs(Math.sin(p))*14;rx=Math.sin(p*2)*.06}else{by+=Math.abs(Math.sin(p))*3;rz=Math.sin(p)*h.wad}}
+  if(h.moving){if(h.hopper){by+=Math.abs(Math.sin(p))*14;rx=Math.sin(p*2)*.06}else{by+=Math.abs(Math.sin(p))*3;rz=Math.sin(p)*(h.wad||.035)}}
   if(h.floater)by+=Math.sin(T*2.4+h.i)*4;
   const br=1+Math.sin(T*2+h.i)*.012;
   h.b.position.y=by;h.b.rotation.set(rx,0,rz);h.b.scale.set(2-br,br,2-br);
